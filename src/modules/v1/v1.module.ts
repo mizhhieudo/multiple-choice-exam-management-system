@@ -1,12 +1,18 @@
 import { Module } from '@nestjs/common';
 import { RouterModule, Routes } from '@nestjs/core';
 import { AuthModule } from '../auth/auth.module';
+import { QuestionModule } from './common/question/question.module';
 import { UsersModule } from './common/users/users.module';
 
 const routes: Routes = [
   {
     path: 'v1/admin',
-    children: [],
+    children: [
+      {
+        path: '/exam-management',
+        module: QuestionModule,
+      },
+    ],
   },
   {
     path: 'v1/client',
@@ -31,7 +37,8 @@ const routes: Routes = [
   imports: [
     RouterModule.register(routes),
     UsersModule,
-    AuthModule, // setup the routes
+    AuthModule,
+    QuestionModule, // setup the routes
   ],
 })
 export class V1Module {}
