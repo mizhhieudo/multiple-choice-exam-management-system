@@ -1,4 +1,6 @@
 import { Model } from 'mongoose';
+import { IListParams, resultPaging } from '../paginate/IPaginate';
+import { SortQueries } from '../paginate/Paginte';
 import { IRepository } from './IReposiory';
 
 export class Repository<T extends Document> implements IRepository<T> {
@@ -14,15 +16,36 @@ export class Repository<T extends Document> implements IRepository<T> {
     return await this._repository.find().populate(this._populateOnFind).exec();
   }
 
-  async get(id: any): Promise<T> {
-    const record = await this._repository.findById(id);
-
-    if (record && this._populateOnFind.length) {
-      for (const path of this._populateOnFind) {
-        await record.populate(path);
-      }
+  async get(paginateParam?: IListParams) {
+    try {
+      const page: number = paginateParam?.page ? paginateParam?.page : 1;
+      const pageSize: number = paginateParam?.pageSize
+        ? paginateParam?.pageSize
+        : 10;
+      const skipDocument: number = (Number(page) - 1) * Number(pageSize);
+      const data = await this._repository.find(
+        { ...paginateParam?.options },
+        null,
+        {
+          skip: skipDocument,
+          limit: pageSize,
+        },
+      );
+      const numberOfDocuments = await this._repository.count();
+      const lastPage = Math.ceil(numberOfDocuments / pageSize);
+      const nextPage = page + 1 > lastPage ? page : page + 1;
+      const prevPage = page - 1 < 1 ? page : page - 1;
+      return {
+        docs: [...data],
+        numberOfDocuments: numberOfDocuments,
+        lastPage: lastPage,
+        nextPage: nextPage,
+        prevPage: prevPage,
+        currentPage: page,
+      };
+    } catch (error) {
+      return error;
     }
-    return record;
   }
 
   async create(item: T): Promise<T> {
@@ -31,6 +54,14 @@ export class Repository<T extends Document> implements IRepository<T> {
 
   async update(id: string, item: T) {
     return await this._repository.findByIdAndUpdate(id, item);
+  }
+
+  async getById(id: string) {
+    return await this._repository.findById(id);
+  }
+
+  async removeById(id: string) {
+    return await this._repository.find({ _id: id }).remove().exec();
   }
 
   getModel() {

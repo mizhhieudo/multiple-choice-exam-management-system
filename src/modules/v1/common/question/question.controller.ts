@@ -12,6 +12,7 @@ import {
   HttpStatus,
   StreamableFile,
   Header,
+  Query,
 } from '@nestjs/common';
 import { QuestionService } from './question.service';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -22,6 +23,8 @@ import * as path from 'path';
 import { Response } from 'express';
 import { createReadStream } from 'fs';
 import { join } from 'path';
+import { SearchQuestion } from './dto/search-question.dto';
+import { UpdateQuestionDto } from './dto/update-question.dto';
 
 @ApiTags('exam-management')
 @Controller()
@@ -72,22 +75,30 @@ export class QuestionController {
   }
 
   @Get()
+  get(@Query() question: SearchQuestion) {
+    return this.questionService.getPaginate(question?.questionDescription);
+  }
+
+  @Get('get-all-questions')
   findAll() {
     return this.questionService.findAll();
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.questionService.findOne(+id);
+    return this.questionService.getById(id);
   }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateQuestionDto: UpdateQuestionDto) {
-  //   return this.questionService.update(+id, updateQuestionDto);
-  // }
+  @Patch(':id')
+  update(
+    @Param('id') id: string,
+    @Body() updateQuestionDto: UpdateQuestionDto,
+  ) {
+    return this.questionService.update(id, updateQuestionDto);
+  }
 
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.questionService.remove(+id);
-  // }
+  @Delete(':id')
+  async remove(@Param('id') id: string) {
+    return await this.questionService.remove(id);
+  }
 }

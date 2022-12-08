@@ -4,6 +4,8 @@ import { UpdateQuestionDto } from './dto/update-question.dto';
 import * as reader from 'xlsx';
 import * as path from 'path';
 import { QuestionRepository } from './question.repository';
+import { IListParams } from 'src/modules/base/paginate/IPaginate';
+import { QuestionDocument } from './entities/question.entity';
 
 @Injectable()
 export class QuestionService {
@@ -36,19 +38,58 @@ export class QuestionService {
     }
   }
 
-  findAll() {
-    return `This action returns all question`;
+  async getPaginate(question: string) {
+    try {
+      const paginateParam = {
+        options: {
+          question: new RegExp(question, 'i'),
+        },
+      };
+      const result = await this.questionRepo.get(<unknown>paginateParam);
+      return result;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} question`;
+  async findAll() {
+    try {
+      return await this.questionRepo.getAll();
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
-  update(id: number, updateQuestionDto: UpdateQuestionDto) {
-    return `This action updates a #${id} question`;
+  async getById(id: string) {
+    try {
+      return await this.questionRepo.getById(id);
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} question`;
+  async update(id: string, updateQuestionDto: UpdateQuestionDto) {
+    try {
+      await this.questionRepo.update(
+        id,
+        <QuestionDocument>(<unknown>updateQuestionDto),
+      );
+      return {
+        message: 'Update records successfully',
+      };
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async remove(id: string) {
+    try {
+      await this.questionRepo.removeById(id);
+      return {
+        message: `Delete item successfully`,
+      };
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 }

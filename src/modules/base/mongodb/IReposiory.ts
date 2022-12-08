@@ -1,7 +1,9 @@
+import { IListParams } from '../paginate/IPaginate';
+
 export interface IRepository<T> {
   getAll(): Promise<T[]>;
 
-  get(id: string): Promise<T>;
+  get(paginateParam?: IListParams);
 
   create(item: T): Promise<T>;
 
