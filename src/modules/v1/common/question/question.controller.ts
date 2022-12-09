@@ -13,6 +13,8 @@ import {
   StreamableFile,
   Header,
   Query,
+  BadGatewayException,
+  BadRequestException,
 } from '@nestjs/common';
 import { QuestionService } from './question.service';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -26,7 +28,7 @@ import { join } from 'path';
 import { SearchQuestion } from './dto/search-question.dto';
 import { UpdateQuestionDto } from './dto/update-question.dto';
 
-@ApiTags('exam-management')
+@ApiTags('Question-management')
 @Controller()
 export class QuestionController {
   constructor(private readonly questionService: QuestionService) {}

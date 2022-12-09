@@ -11,6 +11,12 @@ import { QuestionDocument } from './entities/question.entity';
 export class QuestionService {
   constructor(private readonly questionRepo: QuestionRepository) {}
   async create(filesExcels: Express.Multer.File) {
+    if (
+      filesExcels?.mimetype !==
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    ) {
+      throw new BadRequestException('only accept xlsx format');
+    }
     try {
       const pathFiles = path.join(
         __dirname,
@@ -34,6 +40,7 @@ export class QuestionService {
         data: storeQuestion,
       };
     } catch (error) {
+      console.log(`err ===>`, error.message);
       throw new BadRequestException(error.message);
     }
   }
