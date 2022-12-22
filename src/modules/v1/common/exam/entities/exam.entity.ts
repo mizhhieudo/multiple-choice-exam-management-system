@@ -6,9 +6,17 @@ import { EXAM_CONST } from '../exam.const';
 
 @Schema({ collection: EXAM_CONST.MODEL_NAME, timestamps: true })
 export class Exam {
-  @Prop({ type: String, required: true })
+  @Prop({
+    type: String,
+    required: true,
+    default: ' Đề thi bằng lái xe B2 năm 2022-2023',
+  })
   examMaterial: string;
-  @Prop({ type: String, required: true })
+  @Prop({
+    type: String,
+    required: true,
+    default: 'KSBLXB2',
+  })
   examPaperCode: string;
   @Prop({ type: String, required: true })
   createAt: string;

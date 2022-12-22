@@ -26,7 +26,7 @@ export class ExamController {
 
   @Get()
   find(@Query() question: SearchExam) {
-    return this.examService.findAll();
+    return this.examService.paginate(question);
   }
 
   @Get('get-all-exam')
